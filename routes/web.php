@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PentesterController;
+use App\Http\Controllers\DashboardController;
 
 # Authentication routes
 Route::middleware(["guest"])->controller(AuthController::class)->group(function() {
@@ -10,9 +13,8 @@ Route::middleware(["guest"])->controller(AuthController::class)->group(function(
 });
 Route::post("/logout", [AuthController::class, "logout"])->name("logout");
 
-# Authenticated routes
+
+# Authenticated-only routes
 Route::middleware(["auth"])->group(function() {
-    Route::get("/", action: function() {
-        return view("dashboard");
-    })->name("show.dashboard");
+    Route::get("/", [DashboardController::class, "showDashboard"])->name("show.dashboard");
 });
