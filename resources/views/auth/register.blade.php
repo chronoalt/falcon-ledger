@@ -1,5 +1,5 @@
 <h2>Register</h2>
-<form action="" method="">
+<form action="{{ route("register") }}" method="POST">
     @csrf 
 
     <label for="email">Email:</label>
@@ -8,8 +8,8 @@
     <label for="password">Password:</label>
     <input type="password" name="password" required />
 
-    <label for="confirm-password">Confirm Password:</label>
-    <input type="password" name="confirm-password" required />
+    <label for="password_confirmation">Confirm Password:</label>
+    <input type="password" name="password_confirmation" required />
 
     <button type="submit">Register</button>
 </form>

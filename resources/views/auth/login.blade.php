@@ -1,5 +1,5 @@
 <h2>Login</h2>
-<form action="" method="">
+<form action="{{ route("login") }}" method="POST">
     @csrf 
 
     <label for="email">Email:</label>
