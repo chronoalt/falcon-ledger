@@ -21,6 +21,9 @@ Falcon Ledger is a purpose-built tool for red teamers, penetration testers, and 
 ```bash
 git clone https://github.com/your-org/falcon-ledger.git
 cd falcon-ledger
-# Example for Python backend
-pip install -r requirements.txt
-
+composer install
+cp .env.example .env # Ask chronopad for .env file
+php artisan key:generate
+npm install
+composer run dev
+```
