@@ -13,7 +13,6 @@ Route::middleware(["guest"])->controller(AuthController::class)->group(function(
 });
 Route::post("/logout", [AuthController::class, "logout"])->name("logout");
 
-
 # Authenticated-only routes
 Route::middleware(["auth"])->group(function() {
     Route::get("/", [DashboardController::class, "showDashboard"])->name("show.dashboard");
