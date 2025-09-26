@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
         # Spatie role creation
         $roles = ["admin", "supervisor", "pentester", "client"];
         foreach ($roles as $role) {
-            Role::firstOrCreate(["name" => $role]);
+            Role::create(["name" => $role]);
         }
 
         # Admin user seeding
@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
         # Pentester users seeding
         User::factory(5)->create([
             "password" => Hash::make("pentester123")
-        ])->each(function($user) {
+        ])->each(function ($user) {
             $user->assignRole("pentester");
         });
     }
