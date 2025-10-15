@@ -11,10 +11,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call(CvssVectorSeeder::class);
+
         # Spatie role creation
         $roles = ["admin", "supervisor", "pentester", "client"];
         foreach ($roles as $role) {
-            Role::create(["name" => $role]);
+            Role::firstOrCreate(["name" => $role]);
         }
 
         # Admin user seeding

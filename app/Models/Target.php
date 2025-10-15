@@ -6,24 +6,24 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Asset extends Model
+class Target extends Model
 {
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'project_id',
-        'name',
-        'detail',
-        'address',
+        'asset_id',
+        'label',
+        'endpoint',
+        'description',
     ];
 
-    public function project()
+    public function asset()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Asset::class);
     }
 
-    public function targets()
+    public function findings()
     {
-        return $this->hasMany(Target::class);
+        return $this->hasMany(Finding::class);
     }
 }

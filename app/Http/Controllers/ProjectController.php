@@ -52,6 +52,12 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
+        $project->load([
+            'assets.targets' => function ($query) {
+                $query->withCount('findings');
+            },
+        ]);
+
         return view('projects.show', compact('project'));
     }
 
