@@ -15,22 +15,31 @@ export default function AppLayout({ children }) {
                         <h1 className="text-2xl font-semibold text-slate-900">Falcon Ledger</h1>
                         <p className="text-sm text-slate-500">Secure Ops Dashboard</p>
                     </div>
-                    <div className="flex flex-col md:flex-row md:items-center md:gap-4">
-                        <nav className="flex gap-3 text-sm">
-                            <Link className="text-slate-700 hover:text-slate-900" href="/">Dashboard</Link>
-                            <Link className="text-slate-700 hover:text-slate-900" href="/projects">Projects</Link>
-                        </nav>
-                        <div className="flex items-center gap-3 text-sm text-slate-600">
-                            <span>{auth?.user?.email ?? 'Guest'}</span>
-                            <button
-                                onClick={handleLogout}
-                                className="inline-flex items-center rounded bg-red-500 px-3 py-1.5 text-white text-xs font-medium hover:bg-red-600"
-                                type="button"
-                            >
-                                Logout
-                            </button>
+                    {auth?.user ? (
+                        <div className="flex flex-col md:flex-row md:items-center md:gap-4">
+                            <nav className="flex gap-3 text-sm">
+                                <Link className="text-slate-700 hover:text-slate-900" href="/">
+                                    Dashboard
+                                </Link>
+                                <Link className="text-slate-700 hover:text-slate-900" href="/projects">
+                                    Projects
+                                </Link>
+                            </nav>
+                            <div className="flex items-center gap-3 text-sm text-slate-600">
+                                <span>{auth.user.email}</span>
+                                <button
+                                    onClick={handleLogout}
+                                    className="inline-flex items-center rounded bg-red-500 px-3 py-1.5 text-white text-xs font-medium hover:bg-red-600"
+                                    type="button"
+                                >
+                                    Logout
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        // 🟢 Optional: show guest info or nothing at all
+                        <div className="text-sm text-slate-500">Guest</div>
+                    )}
                 </div>
             </header>
 
