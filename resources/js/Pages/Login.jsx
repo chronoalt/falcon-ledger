@@ -20,7 +20,7 @@ export default function Login() {
                 <p className="text-slate-600">Sign in to continue to your workspace.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded shadow-sm border border-slate-200">
                 <div>
                     <label htmlFor="email" className="block text-sm font-medium text-slate-700">
                         Email
@@ -30,7 +30,7 @@ export default function Login() {
                         type="email"
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
-                        className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-blue-500"
+                        className="mt-1 block w-full rounded border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-blue-500"
                         required
                     />
                     {errors.email && (
@@ -47,7 +47,7 @@ export default function Login() {
                         type="password"
                         value={data.password}
                         onChange={(e) => setData('password', e.target.value)}
-                        className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-blue-500"
+                        className="mt-1 block w-full rounded border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-blue-500"
                         required
                     />
                     {errors.password && (
