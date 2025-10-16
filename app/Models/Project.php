@@ -30,4 +30,9 @@ class Project extends Model
     {
         return $this->hasMany(Note::class);
     }
+
+    public function targets()
+    {
+        return $this->hasManyThrough(Target::class, Asset::class);
+    }
 }
