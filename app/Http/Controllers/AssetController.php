@@ -6,6 +6,8 @@ use App\Models\Asset;
 use App\Models\Project;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class AssetController extends Controller
 {
@@ -24,13 +26,27 @@ class AssetController extends Controller
             ->with('success', 'Asset added successfully.');
     }
 
-    public function edit(Project $project, Asset $asset)
+    public function edit(Project $project, Asset $asset): Response
     {
         $this->assertAssetBelongsToProject($asset, $project);
 
-        return view('assets.edit', [
-            'project' => $project,
-            'asset' => $asset,
+        return Inertia::render('Assets/Edit', [
+            'project' => [
+                'id' => $project->id,
+                'title' => $project->title,
+                'links' => [
+                    'show' => route('projects.show', $project),
+                ],
+            ],
+            'asset' => [
+                'id' => $asset->id,
+                'name' => $asset->name,
+                'address' => $asset->address,
+                'detail' => $asset->detail,
+                'links' => [
+                    'update' => route('projects.assets.update', [$project, $asset]),
+                ],
+            ],
         ]);
     }
 

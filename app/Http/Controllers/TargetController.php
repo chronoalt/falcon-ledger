@@ -7,6 +7,8 @@ use App\Models\Project;
 use App\Models\Target;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class TargetController extends Controller
 {
@@ -25,7 +27,7 @@ class TargetController extends Controller
             ->with('success', 'Target added successfully.');
     }
 
-    public function show(Project $project, Target $target)
+    public function show(Project $project, Target $target): Response
     {
         $this->assertTargetBelongsToProject($target, $project);
 
@@ -38,20 +40,73 @@ class TargetController extends Controller
             'findings.attachments',
         ]);
 
-        return view('targets.show', [
-            'project' => $project,
-            'target' => $target,
+        return Inertia::render('Targets/Show', [
+            'project' => [
+                'id' => $project->id,
+                'title' => $project->title,
+                'links' => [
+                    'show' => route('projects.show', $project),
+                ],
+            ],
+            'target' => [
+                'id' => $target->id,
+                'label' => $target->label,
+                'endpoint' => $target->endpoint,
+                'description' => $target->description,
+                'asset' => [
+                    'id' => $target->asset->id,
+                    'name' => $target->asset->name,
+                ],
+                'links' => [
+                    'createFinding' => route('projects.findings.create', ['project' => $project->id, 'target_id' => $target->id]),
+                ],
+                'findings' => $target->findings->map(function ($finding) use ($project, $target) {
+                    return [
+                        'id' => $finding->id,
+                        'title' => $finding->title,
+                        'status' => $finding->status,
+                        'cvss' => [
+                            'score' => (float) ($finding->cvssVector->base_score ?? 0),
+                            'severity' => ucfirst($finding->cvssVector->base_severity ?? 'unknown'),
+                            'vector' => $finding->cvssVector->vector_string ?? 'N/A',
+                        ],
+                        'updated_human' => optional($finding->updated_at)?->diffForHumans(),
+                        'links' => [
+                            'show' => route('projects.targets.findings.show', [$project, $target, $finding]),
+                        ],
+                    ];
+                })->values(),
+            ],
         ]);
     }
 
-    public function edit(Asset $asset, Target $target)
+    public function edit(Asset $asset, Target $target): Response
     {
         $this->assertTargetBelongsToAsset($target, $asset);
 
-        return view('targets.edit', [
-            'asset' => $asset,
-            'target' => $target,
-            'project' => $asset->project,
+        $project = $asset->project;
+
+        return Inertia::render('Targets/Edit', [
+            'project' => [
+                'id' => $project->id,
+                'title' => $project->title,
+                'links' => [
+                    'show' => route('projects.show', $project),
+                ],
+            ],
+            'asset' => [
+                'id' => $asset->id,
+                'name' => $asset->name,
+            ],
+            'target' => [
+                'id' => $target->id,
+                'label' => $target->label,
+                'endpoint' => $target->endpoint,
+                'description' => $target->description,
+                'links' => [
+                    'update' => route('assets.targets.update', [$asset, $target]),
+                ],
+            ],
         ]);
     }
 

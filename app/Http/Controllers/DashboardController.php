@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function showDashboard() {
+    public function showDashboard(): Response
+    {
         $user = Auth::user();
 
-        if ($user->hasRole("admin")) {
-            return view("admin.dashboard");
-        } elseif ($user->hasRole("pentester")) {
-            return view("pentester.dashboard");
+        if ($user && $user->hasRole("admin")) {
+            return Inertia::render('Admin/Dashboard');
+        }
+
+        if ($user && $user->hasRole("pentester")) {
+            return Inertia::render('Pentester/Dashboard');
         }
 
         abort(403, "Unauthorized");

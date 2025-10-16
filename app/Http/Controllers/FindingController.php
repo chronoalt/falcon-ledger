@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class FindingController extends Controller
 {
@@ -56,14 +58,45 @@ class FindingController extends Controller
         'ps1',
     ];
 
-    public function create(Project $project)
+    public function create(Project $project): Response
     {
         $project->load(['assets.targets']);
 
         $preselectedTargetId = request()->query('target_id');
+        $selectedTarget = null;
 
-        return view('findings.create', [
-            'project' => $project,
+        if ($preselectedTargetId) {
+            $selectedTarget = $project->targets()
+                ->where('targets.id', $preselectedTargetId)
+                ->first();
+        }
+
+        $preselectedTargetId = $selectedTarget?->id;
+
+        return Inertia::render('Findings/Create', [
+            'project' => [
+                'id' => $project->id,
+                'title' => $project->title,
+                'links' => [
+                    'show' => route('projects.show', $project),
+                    'storeFinding' => route('projects.findings.store', $project),
+                    'back' => $selectedTarget
+                        ? route('projects.targets.show', [$project, $selectedTarget])
+                        : route('projects.show', $project),
+                ],
+            ],
+            'assets' => $project->assets->map(function ($asset) {
+                return [
+                    'id' => $asset->id,
+                    'name' => $asset->name,
+                    'address' => $asset->address,
+                    'targets' => $asset->targets->map(fn ($target) => [
+                        'id' => $target->id,
+                        'label' => $target->label,
+                        'endpoint' => $target->endpoint,
+                    ])->values(),
+                ];
+            })->values(),
             'statuses' => Finding::STATUS_OPTIONS,
             'attackVectors' => CvssVector::ATTACK_VECTORS,
             'attackComplexities' => CvssVector::ATTACK_COMPLEXITIES,
@@ -71,7 +104,6 @@ class FindingController extends Controller
             'userInteractions' => CvssVector::USER_INTERACTIONS,
             'scopeOptions' => CvssVector::SCOPE_OPTIONS,
             'impactMetrics' => CvssVector::IMPACT_METRICS,
-            'assets' => $project->assets,
             'preselectedTargetId' => $preselectedTargetId,
             'attachmentLimit' => self::ATTACHMENT_MAX_FILES,
             'attachmentMaxSizeMb' => (int) ceil(self::ATTACHMENT_MAX_SIZE_KB / 1024),
@@ -134,17 +166,46 @@ class FindingController extends Controller
             ->with('success', 'Finding created successfully.');
     }
 
-    public function show(Project $project, Target $target, Finding $finding)
+    public function show(Project $project, Target $target, Finding $finding): Response
     {
         $this->assertFindingBelongsToTarget($finding, $target);
         $this->assertTargetBelongsToProject($target, $project);
 
         $finding->loadMissing(['cvssVector', 'attachments', 'target.asset']);
 
-        return view('findings.show', [
-            'project' => $project,
-            'target' => $target,
-            'finding' => $finding,
+        return Inertia::render('Findings/Show', [
+            'project' => [
+                'id' => $project->id,
+                'title' => $project->title,
+            ],
+            'target' => [
+                'id' => $target->id,
+                'label' => $target->label,
+                'endpoint' => $target->endpoint,
+                'links' => [
+                    'view' => route('projects.targets.show', [$project, $target]),
+                ],
+            ],
+            'finding' => [
+                'id' => $finding->id,
+                'title' => $finding->title,
+                'status' => $finding->status,
+                'description' => $finding->description,
+                'recommendation' => $finding->recommendation,
+                'cvss' => [
+                    'score' => (float) ($finding->cvssVector->base_score ?? 0),
+                    'severity' => ucfirst($finding->cvssVector->base_severity ?? 'unknown'),
+                    'vector' => $finding->cvssVector->vector_string ?? 'N/A',
+                ],
+                'attachments' => $finding->attachments->map(fn ($attachment) => [
+                    'id' => $attachment->id,
+                    'original_name' => $attachment->original_name,
+                    'size' => $attachment->size,
+                    'links' => [
+                        'download' => route('findings.attachments.download', [$finding, $attachment]),
+                    ],
+                ])->values(),
+            ],
         ]);
     }
 
