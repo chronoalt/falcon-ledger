@@ -1,38 +1,68 @@
-import { router, usePage } from '@inertiajs/react';
-import Navigation from './Navigation.jsx';
+import { Link, router, usePage } from '@inertiajs/react';
 
 export default function Header() {
     const { auth } = usePage().props;
+    const user = auth?.user;
 
-    const handleLogout = () => {
+    const handleLogout = (event) => {
+        event.preventDefault();
         router.post('/logout');
     };
 
     return (
-        <header className="bg-white shadow">
-            <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                    <h1 className="text-2xl font-semibold text-slate-900">Falcon Ledger</h1>
-                    <p className="text-sm text-slate-500">Secure Ops Dashboard</p>
+        <header className="bg-[#f4562c] text-white">
+            <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+                {/* Logo + brand */}
+                <div className="flex items-center gap-3">
+                    <img
+                        src="/images/falcon-logo.png"
+                        alt="Falcon Ledger logo"
+                        className="h-9 w-auto"
+                    />
+                    <span className="text-xl font-semibold tracking-tight">
+                        Falcon Ledger
+                    </span>
                 </div>
 
-                {auth?.user ? (
-                    <div className="flex flex-col md:flex-row md:items-center md:gap-4">
-                        <Navigation />
-                        <div className="flex items-center gap-3 text-sm text-slate-600">
-                            <span>{auth.user.email}</span>
-                            <button
-                                onClick={handleLogout}
-                                className="inline-flex items-center rounded bg-red-500 px-3 py-1.5 text-white text-xs font-medium hover:bg-red-600"
-                                type="button"
+                {/* Navigation */}
+                <nav className="flex items-center gap-6 text-sm font-medium">
+                    {user ? (
+                        <>
+                            <Link
+                                href="/"
+                                className="transition hover:opacity-80"
                             >
-                                Logout
-                            </button>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="text-sm text-slate-500">Guest</div>
-                )}
+                                Dashboard
+                            </Link>
+
+                            {/* NOW LABELED PROJECTS */}
+                            <Link
+                                href="/projects"
+                                className="transition hover:opacity-80"
+                            >
+                                Projects
+                            </Link>
+
+                            <form onSubmit={handleLogout}>
+                                <button
+                                    type="submit"
+                                    className="rounded-full bg-[#004a98] px-4 py-1.5 text-sm font-semibold shadow hover:bg-[#003b77]"
+                                >
+                                    Logout
+                                </button>
+                            </form>
+                        </>
+                    ) : (
+                        <>
+                            <Link
+                                href="/login"
+                                className="rounded-full bg-[#004a98] px-4 py-1.5 text-sm font-semibold shadow hover:bg-[#003b77]"
+                            >
+                                Log In
+                            </Link>
+                        </>
+                    )}
+                </nav>
             </div>
         </header>
     );

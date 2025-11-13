@@ -16,92 +16,151 @@ export default function Edit() {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             <Head title={`Edit ${project.title}`} />
 
+            {/* Header row */}
             <div className="flex items-center justify-between">
-                <h2 className="text-3xl font-semibold text-slate-900">Edit Project</h2>
-                <Link href="/projects" className="text-sm text-slate-600 hover:text-slate-800">
+                <h1 className="text-3xl font-extrabold text-[#0050a4]">
+                    Edit Project
+                </h1>
+
+                <Link
+                    href="/projects"
+                    className="text-sm font-semibold text-[#004a98] hover:underline"
+                >
                     ← Back to projects
                 </Link>
             </div>
 
-            <form onSubmit={submit} className="space-y-5 rounded border border-slate-200 bg-white p-6 shadow-sm">
-                <div>
-                    <label className="block text-sm font-medium text-slate-700" htmlFor="title">
-                        Title
-                    </label>
-                    <input
-                        id="title"
-                        type="text"
-                        value={form.data.title}
-                        onChange={(e) => form.setData('title', e.target.value)}
-                        className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring"
-                    />
-                    {form.errors.title && <p className="mt-1 text-xs text-rose-600">{form.errors.title}</p>}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-slate-700" htmlFor="description">
-                        Description
-                    </label>
-                    <textarea
-                        id="description"
-                        value={form.data.description}
-                        onChange={(e) => form.setData('description', e.target.value)}
-                        className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring"
-                        rows="4"
-                    />
-                    {form.errors.description && <p className="mt-1 text-xs text-rose-600">{form.errors.description}</p>}
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
+            {/* Light blue wrapper */}
+            <section className="rounded-2xl bg-[#c7d9f6] p-6 shadow-sm">
+                <form
+                    onSubmit={submit}
+                    className="space-y-5 rounded-2xl bg-[#d8e4fb] p-6"
+                >
+                    {/* Title */}
                     <div>
-                        <label className="block text-sm font-medium text-slate-700" htmlFor="due_at">
-                            Due Date
+                        <label
+                            className="block text-sm font-medium text-[#03407c]"
+                            htmlFor="title"
+                        >
+                            Title
                         </label>
                         <input
-                            id="due_at"
-                            type="date"
-                            value={form.data.due_at ?? ''}
-                            onChange={(e) => form.setData('due_at', e.target.value)}
-                            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring"
+                            id="title"
+                            type="text"
+                            value={form.data.title}
+                            onChange={(e) =>
+                                form.setData('title', e.target.value)
+                            }
+                            className="mt-1 w-full rounded-md border border-white/60 bg-white/80 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
+                            required
                         />
-                        {form.errors.due_at && <p className="mt-1 text-xs text-rose-600">{form.errors.due_at}</p>}
+                        {form.errors.title && (
+                            <p className="mt-1 text-xs text-rose-600">
+                                {form.errors.title}
+                            </p>
+                        )}
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700" htmlFor="status">
-                            Status
-                        </label>
-                        <select
-                            id="status"
-                            value={form.data.status}
-                            onChange={(e) => form.setData('status', e.target.value)}
-                            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring"
-                        >
-                            {statusOptions.map((option) => (
-                                <option key={option} value={option}>
-                                    {option}
-                                </option>
-                            ))}
-                        </select>
-                        {form.errors.status && <p className="mt-1 text-xs text-rose-600">{form.errors.status}</p>}
-                    </div>
-                </div>
 
-                <div className="flex items-center justify-end gap-3">
-                    <Link href="/projects" className="text-sm text-slate-600 hover:text-slate-800">
-                        Cancel
-                    </Link>
-                    <button
-                        type="submit"
-                        disabled={form.processing}
-                        className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
-                    >
-                        {form.processing ? 'Saving...' : 'Update Project'}
-                    </button>
-                </div>
-            </form>
+                    {/* Description */}
+                    <div>
+                        <label
+                            className="block text-sm font-medium text-[#03407c]"
+                            htmlFor="description"
+                        >
+                            Description
+                        </label>
+                        <textarea
+                            id="description"
+                            rows="4"
+                            value={form.data.description ?? ''}
+                            onChange={(e) =>
+                                form.setData('description', e.target.value)
+                            }
+                            className="mt-1 w-full rounded-md border border-white/60 bg-white/80 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
+                        />
+                        {form.errors.description && (
+                            <p className="mt-1 text-xs text-rose-600">
+                                {form.errors.description}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Due date */}
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label
+                                className="block text-sm font-medium text-[#03407c]"
+                                htmlFor="due_at"
+                            >
+                                Due date
+                            </label>
+                            <input
+                                id="due_at"
+                                type="date"
+                                value={form.data.due_at ?? ''}
+                                onChange={(e) =>
+                                    form.setData('due_at', e.target.value)
+                                }
+                                className="mt-1 w-full rounded-md border border-white/60 bg-white/80 px-3 py-2 text-sm text-slate-900 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
+                            />
+                            {form.errors.due_at && (
+                                <p className="mt-1 text-xs text-rose-600">
+                                    {form.errors.due_at}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Status */}
+                        <div>
+                            <label
+                                className="block text-sm font-medium text-[#03407c]"
+                                htmlFor="status"
+                            >
+                                Status
+                            </label>
+                            <select
+                                id="status"
+                                value={form.data.status}
+                                onChange={(e) =>
+                                    form.setData('status', e.target.value)
+                                }
+                                className="mt-1 w-full rounded-md border border-white/60 bg-white/80 px-3 py-2 text-sm text-slate-900 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
+                            >
+                                {statusOptions.map((status) => (
+                                    <option key={status} value={status}>
+                                        {status}
+                                    </option>
+                                ))}
+                            </select>
+                            {form.errors.status && (
+                                <p className="mt-1 text-xs text-rose-600">
+                                    {form.errors.status}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center justify-end gap-3 pt-2">
+                        <Link
+                            href="/projects"
+                            className="text-sm font-semibold text-[#004a98] hover:underline"
+                        >
+                            Cancel
+                        </Link>
+                        <button
+                            type="submit"
+                            disabled={form.processing}
+                            className="rounded-full bg-[#004a98] px-5 py-2 text-sm font-semibold text-white shadow hover:bg-[#003b77] disabled:opacity-70"
+                        >
+                            {form.processing ? 'Saving…' : 'Save Changes'}
+                        </button>
+                    </div>
+                </form>
+            </section>
         </div>
     );
 }
