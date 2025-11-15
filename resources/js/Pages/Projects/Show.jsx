@@ -19,10 +19,16 @@ function TargetCreator({ asset, onCancel }) {
     };
 
     return (
-        <form onSubmit={submit} className="space-y-3 rounded border border-slate-200 bg-slate-50 p-4">
-            <h4 className="text-sm font-semibold text-slate-700">Add Target</h4>
+        <form
+            onSubmit={submit}
+            className="space-y-3 rounded-2xl bg-[#d8e4fb] p-4"
+        >
+            {/* Label */}
             <div>
-                <label className="block text-xs font-medium text-slate-600" htmlFor={`label-${asset.id}`}>
+                <label
+                    className="block text-xs font-medium text-[#03407c]"
+                    htmlFor={`label-${asset.id}`}
+                >
                     Label
                 </label>
                 <input
@@ -30,54 +36,76 @@ function TargetCreator({ asset, onCancel }) {
                     type="text"
                     value={form.data.label}
                     onChange={(e) => form.setData('label', e.target.value)}
-                    className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring"
+                    className="mt-1 w-full rounded-md border border-white/70 bg-white/90 px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
                 />
-                {form.errors.label && <p className="mt-1 text-xs text-rose-600">{form.errors.label}</p>}
+                {form.errors.label && (
+                    <p className="mt-1 text-xs text-rose-600">
+                        {form.errors.label}
+                    </p>
+                )}
             </div>
 
+            {/* Endpoint */}
             <div>
-                <label className="block text-xs font-medium text-slate-600" htmlFor={`endpoint-${asset.id}`}>
+                <label
+                    className="block text-xs font-medium text-[#03407c]"
+                    htmlFor={`endpoint-${asset.id}`}
+                >
                     Endpoint
                 </label>
                 <input
                     id={`endpoint-${asset.id}`}
                     type="text"
                     value={form.data.endpoint}
-                    onChange={(e) => form.setData('endpoint', e.target.value)}
-                    className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring"
+                    onChange={(e) =>
+                        form.setData('endpoint', e.target.value)
+                    }
+                    className="mt-1 w-full rounded-md border border-white/70 bg-white/90 px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
                 />
-                {form.errors.endpoint && <p className="mt-1 text-xs text-rose-600">{form.errors.endpoint}</p>}
+                {form.errors.endpoint && (
+                    <p className="mt-1 text-xs text-rose-600">
+                        {form.errors.endpoint}
+                    </p>
+                )}
             </div>
 
+            {/* Description */}
             <div>
-                <label className="block text-xs font-medium text-slate-600" htmlFor={`description-${asset.id}`}>
+                <label
+                    className="block text-xs font-medium text-[#03407c]"
+                    htmlFor={`description-${asset.id}`}
+                >
                     Description
                 </label>
                 <textarea
                     id={`description-${asset.id}`}
                     rows="3"
                     value={form.data.description}
-                    onChange={(e) => form.setData('description', e.target.value)}
-                    className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring"
+                    onChange={(e) =>
+                        form.setData('description', e.target.value)
+                    }
+                    className="mt-1 w-full rounded-md border border-white/70 bg-white/90 px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
                 />
-                {form.errors.description && <p className="mt-1 text-xs text-rose-600">{form.errors.description}</p>}
+                {form.errors.description && (
+                    <p className="mt-1 text-xs text-rose-600">
+                        {form.errors.description}
+                    </p>
+                )}
             </div>
 
-            <div className="flex justify-end gap-2">
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-3 pt-1">
                 <button
                     type="button"
-                    onClick={() => {
-                        form.reset();
-                        onCancel?.();
-                    }}
-                    className="rounded border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                    onClick={onCancel}
+                    className="text-xs font-semibold text-[#004a98] hover:underline"
                 >
                     Cancel
                 </button>
                 <button
                     type="submit"
                     disabled={form.processing}
-                    className="rounded bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
+                    className="rounded-full bg-[#004a98] px-4 py-1.5 text-xs font-semibold text-white shadow hover:bg-[#003b77] disabled:opacity-70"
                 >
                     {form.processing ? 'Saving…' : 'Create Target'}
                 </button>
@@ -85,6 +113,7 @@ function TargetCreator({ asset, onCancel }) {
         </form>
     );
 }
+
 
 export default function Show() {
     const { project, assets } = usePage().props;
@@ -171,10 +200,13 @@ export default function Show() {
                 <h3 className="text-xl font-semibold text-slate-800">Add Asset</h3>
                 <form
                     onSubmit={submitAsset}
-                    className="grid gap-4 rounded border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-3"
+                    className="grid gap-4 rounded border border-transparent bg-[#d8e4fb] p-6 shadow-sm md:grid-cols-3"
                 >
                     <div className="md:col-span-1">
-                        <label className="block text-sm font-medium text-slate-700" htmlFor="asset-name">
+                        <label
+                            className="block text-sm font-medium text-[#03407c]"
+                            htmlFor="asset-name"
+                        >
                             Name
                         </label>
                         <input
@@ -182,12 +214,20 @@ export default function Show() {
                             type="text"
                             value={assetForm.data.name}
                             onChange={(e) => assetForm.setData('name', e.target.value)}
-                            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring"
+                            className="mt-1 w-full rounded-md border border-white/70 bg-white/90 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
                         />
-                        {assetForm.errors.name && <p className="mt-1 text-xs text-rose-600">{assetForm.errors.name}</p>}
+                        {assetForm.errors.name && (
+                            <p className="mt-1 text-xs text-rose-600">
+                                {assetForm.errors.name}
+                            </p>
+                        )}
                     </div>
+
                     <div className="md:col-span-1">
-                        <label className="block text-sm font-medium text-slate-700" htmlFor="asset-address">
+                        <label
+                            className="block text-sm font-medium text-[#03407c]"
+                            htmlFor="asset-address"
+                        >
                             Scope / Address
                         </label>
                         <input
@@ -195,32 +235,38 @@ export default function Show() {
                             type="text"
                             value={assetForm.data.address}
                             onChange={(e) => assetForm.setData('address', e.target.value)}
-                            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring"
+                            className="mt-1 w-full rounded-md border border-white/70 bg-white/90 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
                         />
-                        {assetForm.errors.address && <p className="mt-1 text-xs text-rose-600">{assetForm.errors.address}</p>}
+                        {assetForm.errors.address && (
+                            <p className="mt-1 text-xs text-rose-600">
+                                {assetForm.errors.address}
+                            </p>
+                        )}
                     </div>
+
                     <div className="md:col-span-3">
-                        <label className="block text-sm font-medium text-slate-700" htmlFor="asset-detail">
+                        <label
+                            className="block text-sm font-medium text-[#03407c]"
+                            htmlFor="asset-description"
+                        >
                             Description
                         </label>
                         <textarea
-                            id="asset-detail"
+                            id="asset-description"
                             rows="3"
-                            value={assetForm.data.detail}
-                            onChange={(e) => assetForm.setData('detail', e.target.value)}
-                            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring"
+                            value={assetForm.data.description}
+                            onChange={(e) =>
+                                assetForm.setData('description', e.target.value)
+                            }
+                            className="mt-1 w-full rounded-md border border-white/70 bg-white/90 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
                         />
-                        {assetForm.errors.detail && <p className="mt-1 text-xs text-rose-600">{assetForm.errors.detail}</p>}
+                        {assetForm.errors.description && (
+                            <p className="mt-1 text-xs text-rose-600">
+                                {assetForm.errors.description}
+                            </p>
+                        )}
                     </div>
-                    <div className="md:col-span-3 flex justify-end">
-                        <button
-                            type="submit"
-                            disabled={assetForm.processing}
-                            className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
-                        >
-                            {assetForm.processing ? 'Saving…' : 'Create Asset'}
-                        </button>
-                    </div>
+
                 </form>
             </section>
 
@@ -234,7 +280,7 @@ export default function Show() {
                     const showForm = showTargetForms[asset.id] ?? false;
 
                     return (
-                        <div key={asset.id} className="rounded border border-slate-200 bg-white shadow-sm">
+                        <div key={asset.id} className="rounded border border-transparent bg-[#d8e4fb] shadow-sm">
                             <div className="flex items-start justify-between px-6 py-4">
                                 <div className="flex items-center gap-3">
                                     <button
@@ -244,7 +290,7 @@ export default function Show() {
                                         className={`flex h-8 w-8 items-center justify-center rounded-full border text-sm font-semibold transition ${
                                             isOpen
                                                 ? 'border-blue-500 bg-blue-100 text-blue-600'
-                                                : 'border-slate-300 bg-white text-slate-500'
+                                                : 'border-slate-300 bg-[#d8e4fb] text-slate-500'
                                         }`}
                                     >
                                         {isOpen ? '–' : '+'}
@@ -277,7 +323,7 @@ export default function Show() {
                             </div>
 
                             {isOpen && (
-                                <div className="space-y-4 border-t border-slate-200 px-6 py-4">
+                                <div className="space-y-4 border-t border-transparent px-6 py-4">
                                     <div className="grid gap-4 md:grid-cols-2">
                                         {asset.targets.length === 0 ? (
                                             <p className="text-sm text-slate-500 md:col-span-2">
@@ -287,7 +333,7 @@ export default function Show() {
                                             asset.targets.map((target) => (
                                                 <div
                                                     key={target.id}
-                                                    className="space-y-3 rounded border border-slate-200 bg-slate-50 p-4"
+                                                    className="space-y-3 rounded border border-transparent bg-[#c7d9f6] p-4"
                                                 >
                                                     <div className="flex items-start justify-between gap-3">
                                                         <div>
@@ -323,7 +369,7 @@ export default function Show() {
                                                     <div className="flex flex-wrap gap-2 text-sm">
                                                         <Link
                                                             href={target.links.view}
-                                                            className="rounded bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
+                                                            className="rounded bg-[#004a98] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#003b77]"
                                                         >
                                                             View Findings
                                                         </Link>

@@ -3,80 +3,117 @@ import { Head, Link, usePage } from '@inertiajs/react';
 export default function Show() {
     const { project, target, finding } = usePage().props;
 
+    const hasAttachments = finding.attachments && finding.attachments.length > 0;
+
     return (
         <div className="space-y-6">
             <Head title={finding.title} />
 
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-3xl font-semibold text-slate-900">{finding.title}</h2>
-                    <p className="text-sm text-slate-600">
-                        Target: {target.label} ({target.endpoint}) • Project: {project.title}
-                    </p>
-                </div>
-                <Link
-                    href={target.links.view}
-                    className="rounded border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
-                >
-                    ← Back to findings
-                </Link>
+            <div className="rounded-2xl bg-[#c7d9f6] p-6 shadow-sm md:flex md:gap-6">
+                {/* Left column – acts like the “Ledger” sidebar */}
+                <aside className="mb-6 w-full max-w-xs md:mb-0">
+                    <h2 className="text-2xl font-bold text-[#03407c]">Ledger</h2>
+                    <p className="mt-1 text-sm text-[#03549a]">{project.title}</p>
+
+                    <div className="mt-4 space-y-1 text-sm text-[#03407c]">
+                        <p className="font-semibold">Target</p>
+                        <p>{target.label}</p>
+                        <p className="text-xs text-[#03549a]">{target.endpoint}</p>
+                    </div>
+
+                    <div className="mt-6 space-y-2 text-xs">
+                        <Link
+                            href={`/projects/${project.id}`}
+                            className="text-[#004a98] hover:underline"
+                        >
+                            ← Back to project
+                        </Link>
+                        <br />
+                        <Link
+                            href={target.links.view}
+                            className="text-[#004a98] hover:underline"
+                        >
+                            View all findings for this target
+                        </Link>
+                    </div>
+                </aside>
+
+                {/* Main notes panel */}
+                <article className="flex-1 rounded-2xl bg-[#d8e4fb] p-6">
+                    <header className="mb-6 text-center">
+                        <p className="text-xs uppercase tracking-wide text-[#03549a]">
+                            {project.title} • {target.label}
+                        </p>
+                        <h1 className="mt-2 text-2xl font-bold text-[#f4562c]">
+                            {finding.title}
+                        </h1>
+                    </header>
+
+                    <section className="space-y-6 text-sm leading-relaxed text-[#03407c]">
+                        <div>
+                            <h2 className="mb-1 text-base font-semibold">Description</h2>
+                            <p className="whitespace-pre-wrap">
+                                {finding.description}
+                            </p>
+                        </div>
+
+                        <div>
+                            <h2 className="mb-1 text-base font-semibold">Recommendation</h2>
+                            <p className="whitespace-pre-wrap">
+                                {finding.recommendation}
+                            </p>
+                        </div>
+
+                        <div className="grid gap-3 text-xs md:grid-cols-3">
+                            <div className="rounded-lg bg-white/70 p-3">
+                                <p className="text-[11px] font-semibold uppercase text-[#03549a]">
+                                    Status
+                                </p>
+                                <p className="mt-1 text-sm capitalize">
+                                    {finding.status}
+                                </p>
+                            </div>
+
+                            <div className="rounded-lg bg-white/70 p-3">
+                                <p className="text-[11px] font-semibold uppercase text-[#03549a]">
+                                    CVSS Score
+                                </p>
+                                <p className="mt-1 text-sm">
+                                    {finding.cvss.score.toFixed(1)} ({finding.cvss.severity})
+                                </p>
+                                <p className="mt-1 text-[11px] text-[#03549a]">
+                                    Vector: {finding.cvss.vector}
+                                </p>
+                            </div>
+
+                            {hasAttachments && (
+                                <div className="rounded-lg bg-white/70 p-3">
+                                    <p className="text-[11px] font-semibold uppercase text-[#03549a]">
+                                        Attachments
+                                    </p>
+                                    <ul className="mt-1 space-y-1">
+                                        {finding.attachments.map((attachment) => (
+                                            <li key={attachment.id}>
+                                                <a
+                                                    href={attachment.links.download}
+                                                    className="text-xs font-semibold text-[#004a98] hover:underline"
+                                                >
+                                                    {attachment.original_name ?? 'Download attachment'}
+                                                </a>
+                                                {attachment.size && (
+                                                    <span className="ml-1 text-[11px] text-slate-500">
+                                                        ({(attachment.size / 1024).toFixed(1)} KB)
+                                                    </span>
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    </section>
+                </article>
             </div>
-
-            <dl className="grid gap-4 md:grid-cols-3">
-                <div className="rounded border border-slate-200 bg-white p-4 shadow-sm">
-                    <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Status</dt>
-                    <dd className="mt-1 text-sm text-slate-700">{finding.status.replace('_', ' ')}</dd>
-                </div>
-                <div className="rounded border border-slate-200 bg-white p-4 shadow-sm">
-                    <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">CVSS Score</dt>
-                    <dd className="mt-1 text-sm text-slate-700">
-                        {finding.cvss.score.toFixed(1)} ({finding.cvss.severity})
-                    </dd>
-                </div>
-                <div className="rounded border border-slate-200 bg-white p-4 shadow-sm md:col-span-1">
-                    <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Vector</dt>
-                    <dd className="mt-1 text-xs text-slate-600">{finding.cvss.vector}</dd>
-                </div>
-            </dl>
-
-            <section className="space-y-2">
-                <h3 className="text-xl font-semibold text-slate-800">Description</h3>
-                <p className="rounded border border-slate-200 bg-white p-4 text-sm text-slate-700 shadow-sm">
-                    {finding.description}
-                </p>
-            </section>
-
-            {finding.recommendation && (
-                <section className="space-y-2">
-                    <h3 className="text-xl font-semibold text-slate-800">Recommendation</h3>
-                    <p className="rounded border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 shadow-sm">
-                        {finding.recommendation}
-                    </p>
-                </section>
-            )}
-
-            {finding.attachments.length > 0 && (
-                <section className="space-y-2">
-                    <h3 className="text-xl font-semibold text-slate-800">Attachments</h3>
-                    <ul className="list-disc space-y-2 pl-5 text-sm text-slate-600">
-                        {finding.attachments.map((attachment) => (
-                            <li key={attachment.id}>
-                                <a
-                                    href={attachment.links.download}
-                                    className="text-blue-600 underline-offset-2 hover:underline"
-                                >
-                                    {attachment.original_name ?? 'Download attachment'}
-                                </a>
-                                {attachment.size && (
-                                    <span className="ml-2 text-xs text-slate-500">
-                                        ({(attachment.size / 1024).toFixed(2)} KB)
-                                    </span>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-                </section>
-            )}
         </div>
     );
 }

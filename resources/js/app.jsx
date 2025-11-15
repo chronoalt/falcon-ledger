@@ -5,6 +5,8 @@ import { createRoot } from 'react-dom/client';
 import AppLayout from './Layouts/AppLayout.jsx';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 
+console.log("VITE DEV MODE ACTIVE");
+
 createInertiaApp({
     resolve: async (name) => {
         const page = await resolvePageComponent(
