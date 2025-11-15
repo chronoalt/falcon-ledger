@@ -23,7 +23,7 @@ class AuthController extends Controller
         if (Auth::attempt($validated)) {
             $request->session()->regenerate();
 
-            return redirect()->route("show.dashboard");
+            return redirect()->route('projects.index');
         }
 
         throw ValidationException::withMessages([
@@ -37,6 +37,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route("show.login");
+        return redirect()->route("login");
     }
 }

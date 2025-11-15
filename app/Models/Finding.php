@@ -18,6 +18,7 @@ class Finding extends Model
     ];
 
     protected $fillable = [
+        'project_id',
         'target_id',
         'cvss_vector_id',
         'title',
@@ -25,6 +26,11 @@ class Finding extends Model
         'description',
         'recommendation',
     ];
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
 
     public function cvssVector()
     {

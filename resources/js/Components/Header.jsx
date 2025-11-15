@@ -6,7 +6,12 @@ export default function Header() {
 
     const handleLogout = (event) => {
         event.preventDefault();
-        router.post('/logout');
+        router.post('/logout', {
+            onFinish: () => {
+                // After the logout request is finished, force a full page reload
+                window.location.href = '/login';
+            }
+        });
     };
 
     return (

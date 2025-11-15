@@ -13,9 +13,11 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class FindingController extends Controller
 {
+    use AuthorizesRequests;
     private const ATTACHMENT_MAX_FILES = 3;
     private const ATTACHMENT_MAX_SIZE_KB = 10240; // 10 MB per file
 
@@ -60,6 +62,7 @@ class FindingController extends Controller
 
     public function create(Project $project): Response
     {
+        $this->authorize('create', Finding::class);
         $project->load(['assets.targets']);
 
         $preselectedTargetId = request()->query('target_id');
@@ -113,6 +116,8 @@ class FindingController extends Controller
 
     public function store(Request $request, Project $project)
     {
+        $this->authorize('create', Finding::class);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'status' => 'required|string|in:' . implode(',', Finding::STATUS_OPTIONS),
@@ -126,24 +131,36 @@ class FindingController extends Controller
             'confidentiality_impact' => 'required|string|in:' . implode(',', array_keys(CvssVector::IMPACT_METRICS)),
             'integrity_impact' => 'required|string|in:' . implode(',', array_keys(CvssVector::IMPACT_METRICS)),
             'availability_impact' => 'required|string|in:' . implode(',', array_keys(CvssVector::IMPACT_METRICS)),
-            'target_id' => 'required|uuid',
+            'target_id' => 'required|uuid|exists:targets,id',
             'attachments' => 'sometimes|array|max:' . self::ATTACHMENT_MAX_FILES,
             'attachments.*' => 'file|max:' . self::ATTACHMENT_MAX_SIZE_KB,
         ]);
 
-        $target = $this->resolveTarget($project, $validated['target_id']);
-        $cvssVector = $this->resolveCvssVector($validated);
+        $target = Target::where('id', $validated['target_id'])
+            ->whereHas('asset', fn($q) => $q->where('project_id', $project->id))
+            ->first();
 
+        if (!$target) {
+            throw ValidationException::withMessages([
+                'target_id' => 'The selected target does not belong to this project.',
+            ]);
+        }
+
+        $this->authorize('view', $target);
+
+        $cvssVector = $this->resolveCvssVector($validated);
         $uploadedFiles = Arr::wrap($request->file('attachments'));
         $this->guardAttachments($uploadedFiles);
 
-        $finding = $target->findings()->create([
-            'title' => $validated['title'],
-            'status' => $validated['status'],
-            'description' => $validated['description'],
-            'recommendation' => $validated['recommendation'] ?? null,
-            'cvss_vector_id' => $cvssVector->id,
-        ]);
+        $finding = new Finding();
+        $finding->project_id = $project->id;
+        $finding->target_id = $target->id;
+        $finding->cvss_vector_id = $cvssVector->id;
+        $finding->title = $validated['title'];
+        $finding->status = $validated['status'];
+        $finding->description = $validated['description'];
+        $finding->recommendation = $validated['recommendation'] ?? null;
+        $finding->save();
 
         foreach ($uploadedFiles as $file) {
             if (is_null($file) || !$file->isValid()) {
@@ -168,8 +185,7 @@ class FindingController extends Controller
 
     public function show(Project $project, Target $target, Finding $finding): Response
     {
-        $this->assertFindingBelongsToTarget($finding, $target);
-        $this->assertTargetBelongsToProject($target, $project);
+        $this->authorize('view', $finding);
 
         $finding->loadMissing(['cvssVector', 'attachments', 'target.asset']);
 
@@ -211,6 +227,8 @@ class FindingController extends Controller
 
     public function downloadAttachment(Finding $finding, FindingAttachment $attachment)
     {
+        $this->authorize('view', $finding);
+
         if ($attachment->finding_id !== $finding->id) {
             abort(404);
         }
@@ -252,65 +270,17 @@ class FindingController extends Controller
         }
     }
 
-    /**
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    private function resolveTarget(Project $project, string $targetId): Target
-    {
-        $target = Target::query()
-            ->where('id', $targetId)
-            ->whereHas('asset', function ($query) use ($project) {
-                $query->where('project_id', $project->id);
-            })
-            ->first();
-
-        if (!$target) {
-            throw ValidationException::withMessages([
-                'target_id' => 'Selected target does not belong to this project.',
-            ]);
-        }
-
-        return $target;
-    }
-
-    /**
-     * @param array<string, mixed> $validated
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     private function resolveCvssVector(array $validated): CvssVector
     {
-        $vector = CvssVector::query()
-            ->where('attack_vector', $validated['attack_vector'])
-            ->where('attack_complexity', $validated['attack_complexity'])
-            ->where('privileges_required', $validated['privileges_required'])
-            ->where('user_interaction', $validated['user_interaction'])
-            ->where('scope', $validated['scope'])
-            ->where('confidentiality_impact', $validated['confidentiality_impact'])
-            ->where('integrity_impact', $validated['integrity_impact'])
-            ->where('availability_impact', $validated['availability_impact'])
-            ->first();
-
-        if (!$vector) {
-            throw ValidationException::withMessages([
-                'cvss' => 'Unable to find a CVSS score for the selected metrics.',
-            ]);
-        }
-
-        return $vector;
-    }
-
-    private function assertFindingBelongsToTarget(Finding $finding, Target $target): void
-    {
-        if ($finding->target_id !== $target->id) {
-            abort(404);
-        }
-    }
-
-    private function assertTargetBelongsToProject(Target $target, Project $project): void
-    {
-        if ($target->asset->project_id !== $project->id) {
-            abort(404);
-        }
+        return CvssVector::findOrCreateFromMetrics([
+            'attack_vector' => $validated['attack_vector'],
+            'attack_complexity' => $validated['attack_complexity'],
+            'privileges_required' => $validated['privileges_required'],
+            'user_interaction' => $validated['user_interaction'],
+            'scope' => $validated['scope'],
+            'confidentiality_impact' => $validated['confidentiality_impact'],
+            'integrity_impact' => $validated['integrity_impact'],
+            'availability_impact' => $validated['availability_impact'],
+        ]);
     }
 }

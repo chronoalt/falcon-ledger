@@ -8,11 +8,14 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AssetController extends Controller
 {
+    use AuthorizesRequests;
     public function store(Request $request, Project $project): RedirectResponse
     {
+        $this->authorize('create', Asset::class);
         $payload = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'nullable|string|max:255',
@@ -28,7 +31,7 @@ class AssetController extends Controller
 
     public function edit(Project $project, Asset $asset): Response
     {
-        $this->assertAssetBelongsToProject($asset, $project);
+        $this->authorize('update', $asset);
 
         return Inertia::render('Assets/Edit', [
             'project' => [
@@ -52,7 +55,7 @@ class AssetController extends Controller
 
     public function update(Request $request, Project $project, Asset $asset): RedirectResponse
     {
-        $this->assertAssetBelongsToProject($asset, $project);
+        $this->authorize('update', $asset);
 
         $payload = $request->validate([
             'name' => 'required|string|max:255',
@@ -69,18 +72,11 @@ class AssetController extends Controller
 
     public function destroy(Project $project, Asset $asset): RedirectResponse
     {
-        $this->assertAssetBelongsToProject($asset, $project);
+        $this->authorize('delete', $asset);
         $asset->delete();
 
         return redirect()
             ->route('projects.show', $project)
             ->with('success', 'Asset removed.');
-    }
-
-    private function assertAssetBelongsToProject(Asset $asset, Project $project): void
-    {
-        if ($asset->project_id !== $project->id) {
-            abort(404);
-        }
     }
 }

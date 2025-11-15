@@ -1,7 +1,10 @@
 import { Head, Link, usePage, router } from '@inertiajs/react';
 
 export default function Index() {
-    const { projects } = usePage().props;
+    const { projects, auth } = usePage().props;
+    const userRoles = auth.user ? auth.user.roles : [];
+
+    const canPerformCrud = userRoles.includes('admin') || userRoles.includes('supervisor');
 
     const handleDelete = (project) => {
         if (!confirm(`Delete project "${project.title}"? This cannot be undone.`)) {
@@ -21,19 +24,22 @@ export default function Index() {
                     Projects
                 </h1>
 
-                <Link
-                    href="/projects/create"
-                    className="rounded-full bg-[#004a98] px-5 py-2 text-sm font-semibold text-white shadow hover:bg-[#003b77] transition"
-                >
-                    Create Project
-                </Link>
+                {canPerformCrud && (
+                    <Link
+                        href="/projects/create"
+                        className="rounded-full bg-[#004a98] px-5 py-2 text-sm font-semibold text-white shadow hover:bg-[#003b77] transition"
+                    >
+                        Create Project
+                    </Link>
+                )}
             </div>
 
             {/* Wrapper */}
             <section className="rounded-2xl bg-[#c7d9f6] p-6 shadow-sm">
                 {projects.length === 0 && (
                     <p className="text-sm text-[#03407c]">
-                        No projects found. Create your first project!
+                        No projects found.
+                        {canPerformCrud && " Create your first project!"}
                     </p>
                 )}
 
@@ -54,7 +60,7 @@ export default function Index() {
                                 </p>
 
                                 <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-[#03549a]">
-                                   
+
                                     {project.status && (
                                         <span
                                             className={`
@@ -87,20 +93,24 @@ export default function Index() {
                                     View
                                 </Link>
 
-                                <Link
-                                    href={project.links.edit}
-                                    className="rounded-full border border-[#004a98] px-4 py-1.5 text-xs font-semibold text-[#004a98] hover:bg-[#004a98] hover:text-white"
-                                >
-                                    Edit
-                                </Link>
+                                {canPerformCrud && (
+                                    <>
+                                        <Link
+                                            href={project.links.edit}
+                                            className="rounded-full border border-[#004a98] px-4 py-1.5 text-xs font-semibold text-[#004a98] hover:bg-[#004a98] hover:text-white"
+                                        >
+                                            Edit
+                                        </Link>
 
-                                <button
-                                    type="button"
-                                    onClick={() => handleDelete(project)}
-                                    className="rounded-full border border-rose-400 px-4 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-600 hover:text-white"
-                                >
-                                    Delete
-                                </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDelete(project)}
+                                            className="rounded-full border border-rose-400 px-4 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-600 hover:text-white"
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     ))}

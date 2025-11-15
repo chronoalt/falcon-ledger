@@ -116,7 +116,12 @@ function TargetCreator({ asset, onCancel }) {
 
 
 export default function Show() {
-    const { project, assets } = usePage().props;
+    const { project, assets, auth } = usePage().props;
+    const userRoles = auth.user ? auth.user.roles : [];
+
+    const canManageAssetsAndTargets =
+        userRoles.includes('admin') || userRoles.includes('supervisor') || userRoles.includes('pentester');
+
 
     const assetForm = useForm({
         name: '',
@@ -196,79 +201,89 @@ export default function Show() {
                 </div>
             </div>
 
-            <section className="space-y-4">
-                <h3 className="text-xl font-semibold text-slate-800">Add Asset</h3>
-                <form
-                    onSubmit={submitAsset}
-                    className="grid gap-4 rounded border border-transparent bg-[#d8e4fb] p-6 shadow-sm md:grid-cols-3"
-                >
-                    <div className="md:col-span-1">
-                        <label
-                            className="block text-sm font-medium text-[#03407c]"
-                            htmlFor="asset-name"
-                        >
-                            Name
-                        </label>
-                        <input
-                            id="asset-name"
-                            type="text"
-                            value={assetForm.data.name}
-                            onChange={(e) => assetForm.setData('name', e.target.value)}
-                            className="mt-1 w-full rounded-md border border-white/70 bg-white/90 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
-                        />
-                        {assetForm.errors.name && (
-                            <p className="mt-1 text-xs text-rose-600">
-                                {assetForm.errors.name}
-                            </p>
-                        )}
-                    </div>
+            {canManageAssetsAndTargets && (
+                <section className="space-y-4">
+                    <h3 className="text-xl font-semibold text-slate-800">Add Asset</h3>
+                    <form
+                        onSubmit={submitAsset}
+                        className="grid gap-4 rounded border border-transparent bg-[#d8e4fb] p-6 shadow-sm md:grid-cols-3"
+                    >
+                        <div className="md:col-span-1">
+                            <label
+                                className="block text-sm font-medium text-[#03407c]"
+                                htmlFor="asset-name"
+                            >
+                                Name
+                            </label>
+                            <input
+                                id="asset-name"
+                                type="text"
+                                value={assetForm.data.name}
+                                onChange={(e) => assetForm.setData('name', e.target.value)}
+                                className="mt-1 w-full rounded-md border border-white/70 bg-white/90 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
+                            />
+                            {assetForm.errors.name && (
+                                <p className="mt-1 text-xs text-rose-600">
+                                    {assetForm.errors.name}
+                                </p>
+                            )}
+                        </div>
 
-                    <div className="md:col-span-1">
-                        <label
-                            className="block text-sm font-medium text-[#03407c]"
-                            htmlFor="asset-address"
-                        >
-                            Scope / Address
-                        </label>
-                        <input
-                            id="asset-address"
-                            type="text"
-                            value={assetForm.data.address}
-                            onChange={(e) => assetForm.setData('address', e.target.value)}
-                            className="mt-1 w-full rounded-md border border-white/70 bg-white/90 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
-                        />
-                        {assetForm.errors.address && (
-                            <p className="mt-1 text-xs text-rose-600">
-                                {assetForm.errors.address}
-                            </p>
-                        )}
-                    </div>
+                        <div className="md:col-span-1">
+                            <label
+                                className="block text-sm font-medium text-[#03407c]"
+                                htmlFor="asset-address"
+                            >
+                                Scope / Address
+                            </label>
+                            <input
+                                id="asset-address"
+                                type="text"
+                                value={assetForm.data.address}
+                                onChange={(e) => assetForm.setData('address', e.target.value)}
+                                className="mt-1 w-full rounded-md border border-white/70 bg-white/90 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
+                            />
+                            {assetForm.errors.address && (
+                                <p className="mt-1 text-xs text-rose-600">
+                                    {assetForm.errors.address}
+                                </p>
+                            )}
+                        </div>
 
-                    <div className="md:col-span-3">
-                        <label
-                            className="block text-sm font-medium text-[#03407c]"
-                            htmlFor="asset-description"
-                        >
-                            Description
-                        </label>
-                        <textarea
-                            id="asset-description"
-                            rows="3"
-                            value={assetForm.data.description}
-                            onChange={(e) =>
-                                assetForm.setData('description', e.target.value)
-                            }
-                            className="mt-1 w-full rounded-md border border-white/70 bg-white/90 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
-                        />
-                        {assetForm.errors.description && (
-                            <p className="mt-1 text-xs text-rose-600">
-                                {assetForm.errors.description}
-                            </p>
-                        )}
-                    </div>
-
-                </form>
-            </section>
+                        <div className="md:col-span-3">
+                            <label
+                                className="block text-sm font-medium text-[#03407c]"
+                                htmlFor="asset-description"
+                            >
+                                Description
+                            </label>
+                            <textarea
+                                id="asset-description"
+                                rows="3"
+                                value={assetForm.data.description}
+                                onChange={(e) =>
+                                    assetForm.setData('description', e.target.value)
+                                }
+                                className="mt-1 w-full rounded-md border border-white/70 bg-white/90 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#004a98] focus:outline-none focus:ring-2 focus:ring-[#004a98]/40"
+                            />
+                            {assetForm.errors.description && (
+                                <p className="mt-1 text-xs text-rose-600">
+                                    {assetForm.errors.description}
+                                </p>
+                            )}
+                        </div>
+                        <div className="md:col-span-3">
+                            <button
+                                type="submit"
+                                disabled={assetForm.processing}
+                                className="inline-flex items-center rounded-full bg-[#004a98] px-4 py-2 text-sm font-semibold text-white shadow hover:bg-[#003b77] disabled:opacity-70"
+                            >
+                                {assetForm.processing ? 'Saving…' : 'Add Asset'}
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            )}
 
                 <section className="space-y-6">
                 <h3 className="text-xl font-semibold text-slate-800">Assets &amp; Targets</h3>
@@ -306,19 +321,23 @@ export default function Show() {
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <Link
-                                        href={asset.links.edit}
-                                        className="rounded border border-amber-400 px-3 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-50"
-                                    >
-                                        Edit
-                                    </Link>
-                                    <button
-                                        type="button"
-                                        onClick={() => deleteAsset(asset)}
-                                        className="rounded border border-rose-400 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50"
-                                    >
-                                        Delete
-                                    </button>
+                                    {canManageAssetsAndTargets && (
+                                        <>
+                                            <Link
+                                                href={asset.links.edit}
+                                                className="rounded border border-amber-400 px-3 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-50"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <button
+                                                type="button"
+                                                onClick={() => deleteAsset(asset)}
+                                                className="rounded border border-rose-400 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50"
+                                            >
+                                                Delete
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
 
@@ -344,19 +363,23 @@ export default function Show() {
                                                             )}
                                                         </div>
                                                         <div className="flex flex-col gap-1">
-                                                            <Link
-                                                                href={target.links.edit}
-                                                                className="rounded border border-amber-400 px-3 py-1 text-xs font-semibold text-amber-600 hover:bg-amber-50"
-                                                            >
-                                                                Edit
-                                                            </Link>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => deleteTarget(asset, target)}
-                                                                className="rounded border border-rose-400 px-3 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50"
-                                                            >
-                                                                Delete
-                                                            </button>
+                                                            {canManageAssetsAndTargets && (
+                                                                <>
+                                                                    <Link
+                                                                        href={target.links.edit}
+                                                                        className="rounded border border-amber-400 px-3 py-1 text-xs font-semibold text-amber-600 hover:bg-amber-50"
+                                                                    >
+                                                                        Edit
+                                                                    </Link>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => deleteTarget(asset, target)}
+                                                                        className="rounded border border-rose-400 px-3 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50"
+                                                                    >
+                                                                        Delete
+                                                                    </button>
+                                                                </>
+                                                            )}
                                                         </div>
                                                     </div>
 
@@ -373,12 +396,14 @@ export default function Show() {
                                                         >
                                                             View Findings
                                                         </Link>
-                                                        <Link
-                                                            href={target.links.createFinding}
-                                                            className="rounded border border-blue-500 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-50"
-                                                        >
-                                                            Add Finding
-                                                        </Link>
+                                                        {canManageAssetsAndTargets && (
+                                                            <Link
+                                                                href={target.links.createFinding}
+                                                                className="rounded border border-blue-500 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-50"
+                                                            >
+                                                                Add Finding
+                                                            </Link>
+                                                        )}
                                                     </div>
                                                 </div>
                                             ))
@@ -386,7 +411,7 @@ export default function Show() {
                                     </div>
 
                                     <div className="space-y-3">
-                                        {!showForm && (
+                                        {canManageAssetsAndTargets && !showForm && (
                                             <button
                                                 type="button"
                                                 onClick={() => handleAddTargetClick(asset.id)}
@@ -399,7 +424,7 @@ export default function Show() {
                                             </button>
                                         )}
 
-                                        {showForm && (
+                                        {canManageAssetsAndTargets && showForm && (
                                             <TargetCreator
                                                 asset={asset}
                                                 onCancel={() => handleCancelTarget(asset.id)}

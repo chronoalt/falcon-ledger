@@ -35,4 +35,9 @@ class Project extends Model
     {
         return $this->hasManyThrough(Target::class, Asset::class);
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
 }

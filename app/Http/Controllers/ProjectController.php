@@ -2,24 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
-use App\Models\Project;
-
 class ProjectController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
     public function index(): Response
     {
-        $projects = Project::query()
+        $user = Auth::user();
+        $projectsQuery = Project::query()
+            ->when(!$user->hasRole(['admin', 'supervisor']), function ($query) use ($user) {
+                $query->whereHas('users', function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                });
+            })
             ->withCount('assets')
-            ->orderByDesc('created_at')
-            ->get()
+            ->orderByDesc('created_at');
+
+        $projects = $projectsQuery->get()
             ->map(fn (Project $project) => [
                 'id' => $project->id,
                 'title' => $project->title,
@@ -44,6 +53,7 @@ class ProjectController extends Controller
      */
     public function create(): Response
     {
+        $this->authorize('create', Project::class);
         return Inertia::render('Projects/Create');
     }
 
@@ -52,6 +62,7 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Project::class);
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -73,6 +84,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project): Response
     {
+        $this->authorize('view', $project);
         $project->load([
             'assets.targets' => function ($query) {
                 $query->withCount('findings');
@@ -128,6 +140,7 @@ class ProjectController extends Controller
      */
     public function edit(Project $project): Response
     {
+        $this->authorize('update', $project);
         $statusOptions = ['Active', 'Inactive', 'Completed'];
 
         return Inertia::render('Projects/Edit', [
@@ -150,6 +163,7 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
+        $this->authorize('update', $project);
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -172,6 +186,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        $this->authorize('delete', $project);
         $project->delete();
 
         return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');

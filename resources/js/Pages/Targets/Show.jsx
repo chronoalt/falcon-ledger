@@ -1,7 +1,11 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function Show() {
-    const { project, target } = usePage().props;
+    const { project, target, auth } = usePage().props;
+    const userRoles = auth.user ? auth.user.roles : [];
+
+    const canAddFinding =
+        userRoles.includes('admin') || userRoles.includes('supervisor') || userRoles.includes('pentester');
 
     return (
         <div className="space-y-6">
@@ -24,12 +28,14 @@ export default function Show() {
                     >
                         Back to project
                     </Link>
-                    <Link
-                        href={target.links.createFinding}
-                        className="rounded bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700"
-                    >
-                        Add Finding
-                    </Link>
+                    {canAddFinding && (
+                        <Link
+                            href={target.links.createFinding}
+                            className="rounded bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700"
+                        >
+                            Add Finding
+                        </Link>
+                    )}
                 </div>
             </div>
 

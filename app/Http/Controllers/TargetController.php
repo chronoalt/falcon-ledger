@@ -9,11 +9,14 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TargetController extends Controller
 {
+    use AuthorizesRequests;
     public function store(Request $request, Asset $asset): RedirectResponse
     {
+        $this->authorize('create', Target::class);
         $payload = $request->validate([
             'label' => 'required|string|max:255',
             'endpoint' => 'required|string|max:255',
@@ -29,7 +32,7 @@ class TargetController extends Controller
 
     public function show(Project $project, Target $target): Response
     {
-        $this->assertTargetBelongsToProject($target, $project);
+        $this->authorize('view', $target);
 
         $target->load([
             'asset',
@@ -82,7 +85,7 @@ class TargetController extends Controller
 
     public function edit(Asset $asset, Target $target): Response
     {
-        $this->assertTargetBelongsToAsset($target, $asset);
+        $this->authorize('update', $target);
 
         $project = $asset->project;
 
@@ -112,7 +115,7 @@ class TargetController extends Controller
 
     public function update(Request $request, Asset $asset, Target $target): RedirectResponse
     {
-        $this->assertTargetBelongsToAsset($target, $asset);
+        $this->authorize('update', $target);
 
         $payload = $request->validate([
             'label' => 'required|string|max:255',
@@ -129,26 +132,12 @@ class TargetController extends Controller
 
     public function destroy(Asset $asset, Target $target): RedirectResponse
     {
-        $this->assertTargetBelongsToAsset($target, $asset);
+        $this->authorize('delete', $target);
         $project = $asset->project;
         $target->delete();
 
         return redirect()
             ->route('projects.show', $project)
             ->with('success', 'Target removed.');
-    }
-
-    private function assertTargetBelongsToProject(Target $target, Project $project): void
-    {
-        if ($target->asset->project_id !== $project->id) {
-            abort(404);
-        }
-    }
-
-    private function assertTargetBelongsToAsset(Target $target, Asset $asset): void
-    {
-        if ($target->asset_id !== $asset->id) {
-            abort(404);
-        }
     }
 }
