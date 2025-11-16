@@ -32,6 +32,7 @@ class ProjectController extends Controller
             ->map(fn (Project $project) => [
                 'id' => $project->id,
                 'title' => $project->title,
+                'description' => $project->description,
                 'status' => $project->status,
                 'due_at' => optional($project->due_at)?->toDateString(),
                 'assets_count' => $project->assets_count,
