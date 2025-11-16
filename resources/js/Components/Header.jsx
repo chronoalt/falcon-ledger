@@ -3,6 +3,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 export default function Header() {
     const { auth } = usePage().props;
     const user = auth?.user;
+    const isAdmin = user?.is_admin;
 
     const handleLogout = (event) => {
         event.preventDefault();
@@ -34,19 +35,19 @@ export default function Header() {
                     {user ? (
                         <>
                             <Link
-                                href="/"
-                                className="transition hover:opacity-80"
-                            >
-                                Dashboard
-                            </Link>
-
-                            {/* NOW LABELED PROJECTS */}
-                            <Link
                                 href="/projects"
                                 className="transition hover:opacity-80"
                             >
                                 Projects
                             </Link>
+                            {isAdmin && (
+                                <Link
+                                    href="/admin/users"
+                                    className="transition hover:opacity-80"
+                                >
+                                    Users
+                                </Link>
+                            )}
 
                             <form onSubmit={handleLogout}>
                                 <button
