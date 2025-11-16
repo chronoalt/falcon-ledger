@@ -4,7 +4,7 @@ const roleOptions = ['admin', 'supervisor', 'pentester', 'client'];
 
 function UserCard({ user, projects, isCurrentUser }) {
     const projectForm = useForm({ project_id: '' });
-    const roleForm = useForm({ role: user.roles[0]?.name || '' });
+    const roleForm = useForm({ role: user.roles[0]?.name || 'client' });
 
     const handleAddUserToProject = (e) => {
         e.preventDefault();
@@ -37,7 +37,7 @@ function UserCard({ user, projects, isCurrentUser }) {
                     <form onSubmit={handleRoleUpdate} className="flex items-center gap-2">
                         <select
                             name="role"
-                            value={roleForm.data.role}
+                            value={roleForm.data.role || 'client'}
                             onChange={(e) => roleForm.setData('role', e.target.value)}
                             disabled={isCurrentUser}
                             className="rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:bg-gray-200"
