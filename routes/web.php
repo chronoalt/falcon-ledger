@@ -10,6 +10,7 @@ use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProfileController;
 
 # Authentication routes
 Route::middleware(["guest"])->group(function () {
@@ -49,6 +50,9 @@ Route::middleware(["auth"])->group(function () {
         ->whereUuid("finding");
     Route::get("findings/{finding}/attachments/{attachment}", [FindingController::class, "downloadAttachment"])
         ->name("findings.attachments.download");
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');

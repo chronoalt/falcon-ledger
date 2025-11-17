@@ -40,6 +40,12 @@ export default function Header() {
                             >
                                 Projects
                             </Link>
+                            <Link
+                                href="/profile"
+                                className="transition hover:opacity-80"
+                            >
+                                Profile
+                            </Link>
                             {isAdmin && (
                                 <Link
                                     href="/admin/users"

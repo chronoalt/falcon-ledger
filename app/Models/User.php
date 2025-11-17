@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -23,6 +24,16 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_photo_path',
+    ];
+
+    /**
+     * Additional attributes to append when the model is serialized.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'profile_photo_url',
     ];
 
     /**
@@ -47,6 +58,17 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Accessor: full URL for the user's profile photo if it exists.
+     */
+    public function getProfilePhotoUrlAttribute(): ?string
+    {
+        return $this->profile_photo_path
+            ? Storage::disk('public')->url($this->profile_photo_path)
+            : null;
+    }
+
     public function projects()
     {
         return $this->belongsToMany(Project::class);

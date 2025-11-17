@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 
 class RegisteredUserController extends Controller
 {
