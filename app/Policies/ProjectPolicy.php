@@ -21,11 +21,11 @@ class ProjectPolicy
      */
     public function view(User $user, Project $project): bool
     {
-        if ($user->roles->pluck('name')->intersect(['admin', 'supervisor'])->isNotEmpty()) {
+        if ($user->roles->pluck('name')->contains('admin')) {
             return true;
         }
 
-        return $user->projects()->where('project_id', $project->id)->exists();
+        return $this->userHasAccess($user, $project);
     }
 
     /**
@@ -41,7 +41,12 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
-        return $user->roles->pluck('name')->intersect(['admin', 'supervisor'])->isNotEmpty();
+        if ($user->roles->pluck('name')->contains('admin')) {
+            return true;
+        }
+
+        return $user->roles->pluck('name')->contains('supervisor')
+            && $this->userHasAccess($user, $project);
     }
 
     /**
@@ -49,7 +54,12 @@ class ProjectPolicy
      */
     public function delete(User $user, Project $project): bool
     {
-        return $user->roles->pluck('name')->intersect(['admin', 'supervisor'])->isNotEmpty();
+        if ($user->roles->pluck('name')->contains('admin')) {
+            return true;
+        }
+
+        return $user->roles->pluck('name')->contains('supervisor')
+            && $this->userHasAccess($user, $project);
     }
 
     /**
@@ -57,7 +67,7 @@ class ProjectPolicy
      */
     public function restore(User $user, Project $project): bool
     {
-        return $user->roles->pluck('name')->intersect(['admin', 'supervisor'])->isNotEmpty();
+        return $this->delete($user, $project);
     }
 
     /**
@@ -65,6 +75,12 @@ class ProjectPolicy
      */
     public function forceDelete(User $user, Project $project): bool
     {
-        return $user->roles->pluck('name')->intersect(['admin', 'supervisor'])->isNotEmpty();
+        return $this->delete($user, $project);
+    }
+
+    protected function userHasAccess(User $user, Project $project): bool
+    {
+        return $project->created_by === $user->id
+            || $project->users()->where('user_id', $user->id)->exists();
     }
 }

@@ -20,9 +20,12 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
         $projectsQuery = Project::query()
-            ->when(!$user->hasRole(['admin', 'supervisor']), function ($query) use ($user) {
-                $query->whereHas('users', function ($q) use ($user) {
-                    $q->where('user_id', $user->id);
+            ->when(!$user->hasRole('admin'), function ($query) use ($user) {
+                $query->where(function ($inner) use ($user) {
+                    $inner->where('created_by', $user->id)
+                        ->orWhereHas('users', function ($q) use ($user) {
+                            $q->where('user_id', $user->id);
+                        });
                 });
             })
             ->withCount('assets')
