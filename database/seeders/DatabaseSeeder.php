@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Role;
-
+use Illuminate\Support\Str;
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
@@ -20,19 +20,18 @@ class DatabaseSeeder extends Seeder
         }
 
         # Admin user seeding
+        $plainPassword = Str::password(24);
         $admin = User::factory()->create([
             "name" => "Administrator",
-            "email" => "admin@example.com",
-            "password" => Hash::make("admin123")
+            "email" => "admin@ledger.com",
+            "password" => Hash::make($plainPassword)
         ]);
         $admin->assignRole("admin");
 
-        # Temporary for testing
-        # Pentester users seeding
-        User::factory(5)->create([
-            "password" => Hash::make("pentester123")
-        ])->each(function ($user) {
-            $user->assignRole("pentester");
-        });
+        if (isset($this->command)) {
+            $this->command->warn('Admin account seeded');
+            $this->command->line('Email: admin@ledger.com');
+            $this->command->line('Password: ' . $plainPassword);
+        }
     }
 }
