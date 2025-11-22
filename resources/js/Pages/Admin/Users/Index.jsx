@@ -120,17 +120,6 @@ export default function Index() {
                 </h1>
             </div>
 
-            {flash.success && (
-                <div className="rounded-md bg-green-50 p-4 text-sm font-medium text-green-700">
-                    {flash.success}
-                </div>
-            )}
-            {flash.error && (
-                <div className="rounded-md bg-rose-50 p-4 text-sm font-medium text-rose-700">
-                    {flash.error}
-                </div>
-            )}
-
             <section className="rounded-2xl bg-[#c7d9f6] p-6 shadow-sm">
                 <div className="space-y-6">
                     {users.map((user) => (
